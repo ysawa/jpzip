@@ -17,17 +17,24 @@ get '/' do
 end
 
 get '/import' do
-  zip_path = './tmp/all.zip'
-  open(zip_path, 'w') do |output|
-    open(Jpzip::PREF_ALL) do |data|
-      output.write(data.read)
+  Jpzip.delete_all
+  @list = Jpzip.import_list
+  haml :import
+end
+
+get '/import/:zip_file' do |zip_file|
+  zip_path = "./tmp/" + zip_file
+  if (!File.exist?(zip_path) || Time.now - File.mtime(zip_path) >= 86400)
+    open(zip_path, 'w') do |output|
+      open(Jpzip::PREF_ALL) do |data|
+        output.write(data.read)
+      end
     end
   end
-  Jpzip.delete_all
   Jpzip.import!(zip_path)
-  FileUtils.rm(zip_path)
   "ok"
 end
+
 
 get '/*.*' do |code, format|
   code.gsub! /\D/, ''

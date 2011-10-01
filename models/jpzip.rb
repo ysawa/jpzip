@@ -21,7 +21,11 @@ class Jpzip
     string.force_encoding("Windows-31J").kconv(Kconv::UTF8, Kconv::SJIS)
   end
 
-  def self.import!(zip_path)
+  def self.import_list
+    YAML.load_file(File.dirname(__FILE__) + "/../config/list.yml")
+  end
+
+  def self.import!(zip_path, prefix = nil)
     Zip::Archive.open(zip_path) do |archive|
       archive.num_files.times do |i|
         archive.fopen(archive.get_name(i)) do |f|
@@ -31,15 +35,18 @@ class Jpzip
             file.write(f.read)
             file.close
             CSV.foreach(csv_path) do |row|
+              code = row[2]
+              if prefix and code !~ /^#{prefix}/
+                next
+              end
               jpzip = Jpzip.new
-              jpzip.code = row[2]
+              jpzip.code = code
               jpzip.pref_kana = self.convert_encoding(row[3])
               jpzip.city_kana = self.convert_encoding(row[4])
               jpzip.pref = self.convert_encoding(row[6])
               jpzip.city = self.convert_encoding(row[7])
               jpzip.save
             end
-            FileUtils.rm(csv_path)
           end
         end
       end

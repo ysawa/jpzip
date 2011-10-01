@@ -1,0 +1,30 @@
+%p
+  import list:
+%ul#import_list
+  - @list.each do |pref|
+    %li{ file: pref["file"] }= pref["name"]
+:javascript
+  var import_list = [];
+  $("ul#import_list li").each(
+    function () {
+      var element = $(this);
+      import_list.push(element.attr("file"));
+    }
+  )
+  import_list = import_list.reverse();
+  function import_file(file) {
+    var element = $("ul#import_list li[file=\"" + file + "\"]");
+    var ref = "import/" + file;
+    element.append("<img src=\"/images/loading.gif\" />");
+    $.get(
+      ref, function (data) {
+        var file = import_list.pop();
+        if (file) {
+          import_file(file);
+        }
+        element.html(data);
+      }
+    )
+  }
+  import_file(import_list.pop());
+
