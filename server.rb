@@ -12,6 +12,14 @@ Dir["./models/*.rb"].each {|file| require file }
 set :haml, { format: :html5, ugly: true }
 set :public, File.dirname(__FILE__) + '/public'
 
+helpers do
+  def number_with_delimiter(number)
+    parts = number.to_s.to_str.split('.')
+    parts[0].gsub!(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1,")
+    parts.join('.')
+  end
+end
+
 get '/' do
   @example = Jpzip.skip(20).first.out
   haml :index
