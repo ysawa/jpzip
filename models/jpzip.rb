@@ -1,5 +1,6 @@
 require 'csv'
 require 'kconv'
+require 'fileutils'
 
 class Jpzip
   include Mongoid::Document
@@ -20,15 +21,16 @@ class Jpzip
     string.force_encoding("Windows-31J").kconv(Kconv::UTF8, Kconv::SJIS)
   end
 
-  def self.import!(zippath)
-    Zip::Archive.open(zippath) do |archive|
+  def self.import!(zip_path)
+    Zip::Archive.open(zip_path) do |archive|
       archive.num_files.times do |i|
         archive.fopen(archive.get_name(i)) do |f|
           if f.name =~ /\.csv$/i
-            file = File.open(File.dirname(zippath) + "/" + f.name, 'w')
+            csv_path = File.dirname(zip_path) + "/" + f.name
+            file = File.open(csv_path, 'w')
             file.write(f.read)
             file.close
-            CSV.foreach(f.name) do |row|
+            CSV.foreach(csv_path) do |row|
               jpzip = Jpzip.new
               jpzip.code = row[2]
               jpzip.pref_kana = self.convert_encoding(row[3])
@@ -37,29 +39,7 @@ class Jpzip
               jpzip.city = self.convert_encoding(row[7])
               jpzip.save
             end
-          end
-        end
-      end
-    end
-  end
-
-  def self.import_rome!(zippath)
-    Zip::Archive.open(zippath) do |archive|
-      archive.num_files.times do |i|
-        archive.fopen(archive.get_name(i)) do |f|
-          if f.name =~ /\.csv$/i
-            file = File.open(f.name, 'w')
-            file.write(f.read)
-            file.close
-            CSV.foreach(f.name) do |row|
-              jpzip = Jpzip.new
-              jpzip.code = row[2]
-              jpzip.pref_kana = row[6]
-              jpzip.city_kana = row[7]
-              jpzip.pref = row[6]
-              jpzip.city = row[7]
-              return row.force_encoding("Windows-31J").encode("UTF-8")
-            end
+            FileUtils.rm(csv_path)
           end
         end
       end

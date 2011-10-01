@@ -6,10 +6,7 @@ require 'sinatra/reloader' if development?
 require 'open-uri'
 require 'zipruby'
 
-Mongoid.configure do |config|
-  config.master = Mongo::Connection.new.db('jpzip')
-end
-
+require './config/mongoid'
 Dir["./models/*.rb"].each {|file| require file }
 
 set :haml, {:format => :html5 }
@@ -20,24 +17,16 @@ get '/' do
 end
 
 get '/import' do
-  zippath = './tmp/all.zip'
-  #open(zippath, 'w') do |output|
-  #  open(Jpzip::PREF_ALL) do |data|
-  #    output.write(data.read)
-  #  end
-  #end
+  zip_path = './tmp/all.zip'
+  open(zip_path, 'w') do |output|
+    open(Jpzip::PREF_ALL) do |data|
+      output.write(data.read)
+    end
+  end
   Jpzip.delete_all
-  Jpzip.import!(zippath)
-end
-
-get '/import/rome' do
-  zippath = './tmp/all_rome.zip'
-  #open(zippath, 'w') do |output|
-  #  open(Jpzip::PREF_ALL_ROME) do |data|
-  #    output.write(data.read)
-  #  end
-  #end
-  Jpzip.import_rome!(zippath)
+  Jpzip.import!(zip_path)
+  FileUtils.rm(zip_path)
+  "ok"
 end
 
 get '/*.*' do |code, format|
