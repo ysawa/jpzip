@@ -1,0 +1,1 @@
+jpzip api searches zip codes in Japan.
