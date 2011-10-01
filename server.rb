@@ -47,7 +47,7 @@ get '/*.*' do |code, format|
   attrs = jpzip.out
   case format
   when "xml"
-    attrs.to_xml
+    attrs.to_xml(root: "jpzip")
   when "json"
     attrs.to_json
   else
