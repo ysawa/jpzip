@@ -25,7 +25,7 @@ class Jpzip
       archive.num_files.times do |i|
         archive.fopen(archive.get_name(i)) do |f|
           if f.name =~ /\.csv$/i
-            file = File.open("./tmp/" + f.name, 'w')
+            file = File.open(File.dirname(zippath) + "/" + f.name, 'w')
             file.write(f.read)
             file.close
             CSV.foreach(f.name) do |row|

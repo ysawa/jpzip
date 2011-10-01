@@ -13,6 +13,7 @@ end
 Dir["./models/*.rb"].each {|file| require file }
 
 set :haml, {:format => :html5 }
+set :public, File.dirname(__FILE__) + '/public'
 
 get '/' do
   haml :index
