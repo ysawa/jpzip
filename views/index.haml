@@ -1,11 +1,35 @@
 %p
-  jpzip api searches zip codes in Japan.
+  Jpzip api searches zip codes in Japan.
 %h2
-  jpzip's Many Features
+  Jpzip's Features
 %ul
   %li Sinatra and mongodb make it faster!
   %li You can use it with jQuery very easy.
   %li It uses Cloud Foundry.
+%h2
+  Usages
+- if request.host == 'localhost'
+  - protocol = 'http://'
+  - port = ':' + request.port.to_s
+- else
+  - protocol = 'https://'
+  - port = ''
+- url = "#{protocol}#{request.host}#{port}/9880041.xml"
+%pre>
+  %code>
+    %a{ href: url, target: "_blank" }= url
+%h2
+  Examples
+%h3
+  Json
+%pre>
+  %code>
+    &= @example.to_json
+%h3
+  XML
+%pre>
+  %code>
+    &= @example.to_xml
 %h2
   Source
 %dl

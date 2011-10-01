@@ -3,14 +3,17 @@ require 'mongoid'
 require 'sinatra/reloader' if development?
 require 'open-uri'
 require 'zipruby'
+require 'haml'
+require 'sass'
 
 require './config/mongoid'
 Dir["./models/*.rb"].each {|file| require file }
 
-set :haml, {:format => :html5 }
+set :haml, { format: :html5, ugly: true }
 set :public, File.dirname(__FILE__) + '/public'
 
 get '/' do
+  @example = Jpzip.skip(20).first.out
   haml :index
 end
 
@@ -33,13 +36,15 @@ get '/import/:zip_file' do |zip_file|
   "ok"
 end
 
+get '/main.css' do
+  sass :main
+end
 
 get '/*.*' do |code, format|
   code.gsub! /\D/, ''
   jpzip = Jpzip.where(:code => code).first
   return 404 unless jpzip
-  attrs = jpzip.attributes
-  attrs.delete("_id")
+  attrs = jpzip.out
   case format
   when "xml"
     attrs.to_xml

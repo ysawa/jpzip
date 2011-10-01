@@ -16,6 +16,13 @@ class Jpzip
 
   LIST_DIRECTORY = 'http://www.post.japanpost.jp/zipcode/dl/kogaki/zip/';
 
+  def out
+    attrs = self.attributes
+    attrs.delete("_id")
+    attrs.delete("created_at")
+    attrs
+  end
+
   def self.convert_encoding(string)
     string.force_encoding("Windows-31J").kconv(Kconv::UTF8, Kconv::SJIS)
   end
