@@ -14,8 +14,7 @@ class Jpzip
   field :city_rome, :type => String
   index :code
 
-  PREF_ALL = 'http://www.post.japanpost.jp/zipcode/dl/kogaki/zip/ken_all.zip';
-  PREF_ALL_ROME = "http://www.post.japanpost.jp/zipcode/dl/roman/ken_all_rome.zip";
+  LIST_DIRECTORY = 'http://www.post.japanpost.jp/zipcode/dl/kogaki/zip/';
 
   def self.convert_encoding(string)
     string.force_encoding("Windows-31J").kconv(Kconv::UTF8, Kconv::SJIS)
@@ -25,7 +24,7 @@ class Jpzip
     YAML.load_file(File.dirname(__FILE__) + "/../config/list.yml")
   end
 
-  def self.import!(zip_path, prefix = nil)
+  def self.import!(zip_path)
     Zip::Archive.open(zip_path) do |archive|
       archive.num_files.times do |i|
         archive.fopen(archive.get_name(i)) do |f|
@@ -36,9 +35,6 @@ class Jpzip
             file.close
             CSV.foreach(csv_path) do |row|
               code = row[2]
-              if prefix and code !~ /^#{prefix}/
-                next
-              end
               jpzip = Jpzip.new
               jpzip.code = code
               jpzip.pref_kana = self.convert_encoding(row[3])
@@ -47,6 +43,7 @@ class Jpzip
               jpzip.city = self.convert_encoding(row[7])
               jpzip.save
             end
+            FileUtils.rm(csv_path)
           end
         end
       end

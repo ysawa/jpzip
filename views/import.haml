@@ -15,14 +15,21 @@
   function import_file(file) {
     var element = $("ul#import_list li[file=\"" + file + "\"]");
     var ref = "import/" + file;
-    element.append("<img src=\"/images/loading.gif\" />");
+    element.append(": ");
+    var interval = setInterval(
+      function () { element.append("."); },
+      1000
+    );
     $.get(
       ref, function (data) {
         var file = import_list.pop();
         if (file) {
           import_file(file);
+        } else {
+          alert("finished!");
         }
-        element.html(data);
+        clearInterval(interval);
+        element.append("ok");
       }
     )
   }

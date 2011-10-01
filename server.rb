@@ -1,5 +1,3 @@
-require "bundler"
-Bundler.setup
 require 'sinatra'
 require 'mongoid'
 require 'sinatra/reloader' if development?
@@ -26,7 +24,7 @@ get '/import/:zip_file' do |zip_file|
   zip_path = "./tmp/" + zip_file
   if (!File.exist?(zip_path) || Time.now - File.mtime(zip_path) >= 86400)
     open(zip_path, 'w') do |output|
-      open(Jpzip::PREF_ALL) do |data|
+      open(Jpzip::LIST_DIRECTORY + zip_file) do |data|
         output.write(data.read)
       end
     end
