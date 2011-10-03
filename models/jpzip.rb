@@ -14,7 +14,8 @@ class Jpzip
   field :city_rome, :type => String
   index :code
 
-  LIST_DIRECTORY = 'http://www.post.japanpost.jp/zipcode/dl/kogaki/zip/';
+  LIST_DIRECTORY = 'http://www.post.japanpost.jp/zipcode/dl/kogaki/zip/'
+  LIST_ROME_DIRECTORY = 'http://www.post.japanpost.jp/zipcode/dl/roman/'
 
   def out
     attrs = self.attributes
@@ -29,6 +30,10 @@ class Jpzip
 
   def self.import_list
     YAML.load_file(File.dirname(__FILE__) + "/../config/list.yml")
+  end
+
+  def self.import_list_rome
+    YAML.load_file(File.dirname(__FILE__) + "/../config/list_rome.yml")
   end
 
   def self.import!(zip_path)
